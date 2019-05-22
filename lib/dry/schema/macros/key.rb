@@ -27,7 +27,8 @@ module Dry
         #
         # @api public
         def filter(*args, &block)
-          filter_schema.optional(name).value(*args, &block)
+          key = filter_schema.macros.detect { |m| m.name.equal?(name) }
+          (key ? key : filter_schema.optional(name)).value(*args, &block)
           self
         end
 
