@@ -178,6 +178,20 @@ module Dry
         @rule_applier ||= steps.last
       end
       alias_method :to_rule, :rule_applier
+
+      # Check if there are filter rules
+      #
+      # @api private
+      def filter_rules?
+        steps.select { |s| s.is_a?(RuleApplier) }.size > 1
+      end
+
+      # Check if there are filter rules
+      #
+      # @api private
+      def filter_schema
+        @filter_schema ||= steps.select { |s| s.is_a?(RuleApplier) }.first
+      end
     end
   end
 end

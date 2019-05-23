@@ -233,8 +233,8 @@ module Dry
       # @return [Dry::Types::Safe]
       #
       # @api private
-      def new(&block)
-        self.class.new(processor_type: processor_type, &block)
+      def new(options = EMPTY_HASH, &block)
+        self.class.new(options.merge(processor_type: processor_type), &block)
       end
 
       # Set a type for the given key name
@@ -302,7 +302,14 @@ module Dry
         end
       end
 
-      private
+      # Build an input schema DSL used by `filter` API
+      #
+      # @see Macros::Value#filter
+      #
+      # @api private
+      def filter_schema
+        @__filter_schema__ ||= new(parent: parent_filter_schema)
+      end
 
       # Check if any filter rules were defined
       #
@@ -311,13 +318,12 @@ module Dry
         instance_variable_defined?('@__filter_schema__') && !filter_schema.macros.empty?
       end
 
-      # Build an input schema DSL used by `filter` API
-      #
-      # @see Macros::Value#filter
-      #
+      private
+
       # @api private
-      def filter_schema
-        @__filter_schema__ ||= new
+      def parent_filter_schema
+        return unless parent
+        parent.filter_schema if parent.filter_rules? 
       end
 
       # Build a key coercer
